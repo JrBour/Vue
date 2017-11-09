@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Test Vue</title>
+</head>
+<body>
+
+
+    <style>
+    .active {
+        color: red;
+    }
+    .text-danger {
+        color: blue;
+    }
+    </style>
+    
+<!--<div id="app">
+    {{message}}
+</div>
+
+<div id="app-2">
+    <span v-bind:title="message">
+        Hover your mouse over me for a few seconds to see me dynamically bound title!
+    </span>
+</div>
+
+<div id="app-3">
+    <span v-if="seen">You see me</span>
+    <span v-bind:id="message"></span>
+    <span v-bind:id="'Le message est le suivant ' + message"></span>
+
+    <a :href="url">Clique ici sale con</a>
+    <a @click="coucou">Clique ici sale con</a>
+    <button v-bind:disabled="isDisabled">Button</button>
+    
+    <p>{{ 20 * 20}}</p>
+</div>
+
+<div id="app-4">
+    <ol>
+        <li v-for="todo in todos">
+            {{ todo.text }}
+        </li>
+    </ol>
+</div>
+
+<div id="app-5">
+    <p>{{message}}</p>
+    <button v-on:click="reverseMessage">Reverse Message</button>
+</div>
+
+<div id="app-6">
+    <p>{{message}}</p>
+    <input v-model="message"/>
+</div>
+
+
+<div id="app-7">
+    <ol>
+        <todo-item
+        v-for="items in groceryList"
+        v-bind:todo="items"
+        v-bind:key="items.id">
+        </todo-item>
+    </ol>
+</div>
+
+<div id="example">
+    <p>Original message:{{message}}</p>
+    <p>Computed reversed message: {{reversedMessage}}</p>
+    <p>{{now}}</p>
+</div>
+
+<div id="example2">
+    <p>{{fullName}}</p>
+</div>
+
+<div id="watch-example">
+    <p>
+        Ask a yes/no question:
+        <input v-model="question">
+    </p>
+    <p>{{answer}}</p>
+</div>
+
+<div id="app-8">
+    <p v-bind:class="{active: isActive, 'text-danger': hasError}">POMME DE TERRE</p>
+    <button @click="toggle">Toggle the text</button>
+</div>
+<div id="app-9">
+    <p v-bind:class="classObject">POMME DE TERRE</p>
+    <p v-bind:class="classeObject">POMME DE TERRE</p>
+    <p v-bind:class="[activeClass, errorClass]">POMME DE TERRE</p>
+    <p v-bind:class="[isActive ? activeClass : '', errorClass]">POMME DE TERRE</p>
+    <p v-bind:style="styleObject">Test Style object</p>
+</div>-->
+<div id="app-10">
+    <p v-if="ok">Hello everybody</p>
+    <p v-else>No</p>
+    <template v-if="loginType == true">
+        <label for="username">Username</label>
+        <input type="text" placeholder="Enter your username" key="username-input">
+    </template>
+    <template v-else>
+        <label for="email">Email</label>
+        <input type="email" placeholder="Enter your email" key="email-input">
+    </template><br>
+    <button @click="toggleInput">Toggle Bitch</button>
+    <h1 v-show="ok">Hello</h1>
+    
+    <ul>
+        <li v-for="(item, index) in items">{{parentMessage}} – {{index}} – {{item.message}}</li>
+    </ul>
+    <ul>
+        <li v-for="(value, key) in object">{{key}} : {{value}}</li>
+    </ul>
+    <ul>
+        <li v-for="( value, key, index) in object">{{index}} – {{key}} : {{value}}</li>
+    </ul>    
+    <ul>
+        <li v-for="(value, key, index) in userProfile">{{index}} – {{key}} : {{value}}</li>
+        <button @click="add">Ajouter une valeur</button>
+        <button @click="addObj">Assigner une valeur</button>
+    </ul>
+    <ul v-if="items.length">
+        <li v-for="item in items">{{item}}</li>
+    </ul>
+    <p v-else>No items…</p>
+</div>
+<div id="inputMove">
+    <input type="text" v-model="newTodoText" v-on:keyup.enter="addNewTodo" placeholder="Add a todo">
+    <ul>
+        <li 
+            is="todo-item"
+            v-for="(todo, index) in todos"
+            v-bind:key="todo.id"
+            v-bind:title="todo.title"
+            v-on:remove="todos.splice(index, 1)" 
+        ></li>  <!-- We remove the todos thanks to is index. When the function splice has two arguments, they remove. When the function has three arguments, she edit  -->
+                <!-- The attributes 'is' allow to call the component 'todo-item' -->
+    </ul>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/axios@0.12.0/dist/axios.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lodash@4.13.1/lodash.min.js"></script>
+<script  src="https://unpkg.com/vue"></script>
+
+<script>
+
+    Vue.component('todo-item',{
+        template: '\
+        <li>\
+        {{title}}\
+        <button v-on:click="$emit(\'remove\')">X</button>\
+        </li>\
+        ',
+        props: ['title']
+    })
+
+    var inputMove = new Vue({
+        el:"#inputMove",
+        data: {
+            newTodoText : '',
+            todos: [
+                {
+                    id : 1,
+                    title : 'Do the dishes'
+                },
+                {
+                    id: 2,
+                    title: 'Take out the trash'
+                },
+                {
+                    id: 3,
+                    title: 'Maw the lawn'
+                }
+            ],
+            nextTodoId: 4
+        },
+        methods: {
+            addNewTodo: function(){
+                this.todos.push({
+                    id: this.nextTodoId++,
+                    title: this.newTodoText
+                })
+                this.newTodoText = ''
+            }
+        }
+    })
+
+    var app10 = new Vue({
+        el:"#app-10",
+        data:{
+            ok: true,
+            loginType: true,
+            parentMessage: 'Parent',
+            userProfile: {
+                name: 'Anika'
+            },
+            items: [
+                {message: 'Foo'},
+                {message: 'Bar'}
+            ],
+            object: {
+                firstName: 'John',
+                lastName: 'Doe',
+                age: 30
+            }
+        },
+        methods:{
+            func: function(){
+                items.filter(function(item) {
+                    return item.message.match(/Foo/)
+                }) // Ce qu'il faut colle dans la console app10.items = app10.items.filter(function (item) {return item.message.match(/Foo/)})
+                // Set value array Vue.set(example1.items, indexOfItem, newValue)
+                // Add new value array example1.items.splice(indexOfItem, 1, newValue)
+                // Change length new value array example1.items.splice(newLength)
+            },
+            toggleInput: function(){
+                this.loginType = !this.loginType;
+            },
+            add: function(){
+                this.$set(this.userProfile, 'age', 27);
+            },
+            addObj: function(){
+                this.userProfile = Object.assign({}, this.userProfile, {
+                    age: 27,
+                    favoriteColor: 'Vue green'
+                })
+            }
+        }
+    })
+     /*
+    var app9 = new Vue({
+        el:"#app-9",
+        data:{
+            styleObject:{
+                color:'red',
+                fontSize: '1em',
+                fontWeight: 'bold'
+            },
+            isActive: true,
+            error: null,
+            activeClass: 'active',
+            errorClass: 'text-danger',
+            classObject:{
+                active: true,
+                'text-danger': false
+            }
+        },
+        computed: {
+            classeObject: function(){
+                return {
+                    active: this.isActived && !this.error,
+                    'text-danger' : this.error && this.error.type === "fatal"
+                }
+            }
+        }
+    })
+
+    var watchExampleVM = new Vue({
+        el: '#watch-example',
+        data: {
+            question: '',
+            answer: 'I cannot give you an answer until you ask a question !'
+        },
+        watch: { // This type of methods is perform in asynchronous operation
+            question: function(newQuestion) {
+                this.answer = 'Waiting for you to stop typing'
+                this.getAnswer()
+            }
+        },
+        methods:{
+               // _.debounce is a function provided by lodash to limit how
+                // often a particularly expensive operation can be run.
+                // In this case, we want to limit how often we access
+                // yesno.wtf/api, waiting until the user has completely
+                // finished typing before making the ajax request. To learn
+                // more about the _.debounce function (and its cousin
+                // _.throttle), visit: https://lodash.com/docs#debounce
+            getAnswer: _.debounce(
+                function(){
+                    if(this.question.indexOf('?') === -1) {
+                        this.answer = 'Questions usually contains a question mark ;-)'
+                        return
+                    }
+                    this.answer = 'Thinking...'
+                    var vm = this
+                    axios.get('https://yesno.wtf/api')
+                    .then(function(response) {
+                        vm.answer = _.capitalize(response.data.answer)
+                    })
+                    .catch(function(error) {
+                        vm.answer = 'Error! Could not rich the API.' + error
+                    })
+                },
+                // This is the number of milliseconds we wait for the
+                // user to stop typing.
+                500
+            )    
+        }
+    })
+    var example = new Vue({
+        el:"#example",
+        data: {
+            message: "Bonjour"
+        },
+        computed:{
+            reversedMessage: function(){
+                return this.message.split('').reverse().join('');
+            }, // Allow to not reload the function, if the that return the function doesn't change. The function do the reverse
+            now: function() {
+                return Date.now();
+            }
+        }
+    })
+    var example2 = new Vue({
+        el:"#example2",
+        data:{
+            firstName: 'Coucou',
+            lastName: 'Bar'
+        },
+        computed: {
+            fullName: {
+                get: function(){
+                    return this.firstName + ' ' + this.lastName
+                },
+                set: function(newValue) {
+                    var names = newValue.split(' ')
+                    this.firstName = names[0]
+                    this.lastName = names[names.length - 1]
+                }
+            }
+        }
+    })
+    example2.fullName = 'John Doe';
+    var app = new Vue({
+        el: '#app',
+        data:{
+            message: 'Hello vue !'
+        }
+    })
+    var app2 = new Vue({
+        el:"#app-2",
+        data:{
+            message: 'You loaded this page on ' + new Date().toLocaleString()
+        }
+    })
+    var app3 = new Vue({
+        el:"#app-3",
+        data:{
+            seen: true,
+            message: 'How are you ?',
+            isDisabled: true,
+            url: 'https://facebook.com'
+        },
+        methods:{
+            coucou: function(){
+                console.log('Cette méthode fonctionne')
+            }
+        }
+    })
+    var app4 = new Vue ({
+        el:"#app-4",
+        data:{
+            todos : [
+                {text: 'Learn Javascript'},
+                {text: 'Learn Vue.js'},
+                {text: 'Build something awesome'}
+            ]
+        }
+    })
+    var app5 = new Vue ({
+        el:"#app-5",
+        data:{
+            message: 'Hello Vue.js!'
+        },
+        methods:{
+            reverseMessage: function () {
+                this.message = this.message.split('').reverse().join('')
+            }
+        }
+    })
+    var app6 = new Vue({
+        el:"#app-6",
+        data:{
+            message: 'Bonjour la france'
+        }
+    })
+    var app7 = new Vue({
+        el:"#app-7",
+        data:{
+            groceryList : [
+                { id: 0, text: 'Vegetables'},
+                { id: 1, text: 'Cheese'},
+                { id: 2, text: 'Whatever…'}
+            ]
+        }
+    })
+    var app8 = new Vue({
+        el:"#app-8",
+        data:{
+            isActive: true,
+            hasError: false
+        },
+        methods:{
+            toggle: function(){
+                this.isActive = !this.isActive
+                this.hasError = !this.hasError
+            }
+        }
+    })
+
+    Vue.component('todo-item', {
+        props: ['todo'],
+        template: '<li>{{todo.text}}</li>'
+      })
+
+
+    new Vue({  
+        data:{
+            a:1
+        },
+        created: function(){
+            console.log('a is ' + this.a); // This function will be call when 'a' will be create. The other method are 'mounted', 'updated' and 'destroyed'
+        }
+    })*/
+    </script>
+
+</body>
+</html>
