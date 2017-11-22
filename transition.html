@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link href="https://cdn.jsdelivr.net/npm/animate.css@3.5.1" rel="stylesheet" type="text/css">    
+    <title>Document</title>
+</head>
+<body>
+
+    <style>
+        .fade-enter-active, .fade-leave-active {
+            transition: opacity .5s;
+        }
+        .fade-enter, .fade-leave-to{
+            opacity: 0;
+        }
+
+        .slide-fade-enter-active{
+            transition: all .3s ease;
+        }
+        .slide-fade-leave-active{
+            transition: all .8s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+        }
+        .slide-fade-enter, .slide-fade-leave-to{
+            transform: translateX(10px);
+            opacity: 0;
+        }
+
+        .bounce-enter-active {
+            animation: bounce-in .5s;
+        }
+        .bounce-leave-active {
+            animation: bounce-in .5s reverse;
+        }
+        @keyframes bounce-in {
+            0%{
+                transform: scale(0);
+            }
+            50% {
+                transform: scale(1.5);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+        .list-item{
+            display: inline-block;
+            margin-right: 18px;
+        }
+        .list-enter-active, .list-leave-active{
+            transition: all 1s;
+        }
+        .list-enter, .list-leave-to{
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .flip-list-move{
+            transition:transform 1s;
+        }
+
+    </style>
+
+    <div id="demo">
+        <button @click="show = !show">Toggle</button>
+        <transition name="fade">
+            <p v-if="show">Hello</p>
+        </transition>
+    </div>
+
+    <div id="example-1">
+        <button @click="show = !show">Toggle render</button>
+        <transition name="slide-fade">
+            <p v-if="show">Hello</p>
+        </transition>
+    </div>
+    <div id="example-2">
+        <button @click="show = !show">Toggle show</button>
+        <transition name="bounce">
+            <p v-if="show">Hello</p>
+        </transition>
+    </div>
+
+    <div id="example-3">
+        <button @click="show = !show">Toggle render</button>
+        <transition
+            name="custom-classes-transition"
+            enter-active-class="animated data"
+            leave-active-class="animated    bounceOutRight">
+            <p v-if="show">Hello</p>
+        </transition>
+    </div>
+
+    <div id="example-4">
+        <button @click="show = !show">
+            Toggle
+        </button>
+        <transition
+            v-on:before-enter="beforeEnter"
+            v-on:enter="enter"
+            v-on:leave="leave"
+            v-bind:css="false"
+        >
+            <p v-if="show">
+            Demo
+            </p>
+        </transition>
+    </div>
+
+    <!--<div id="example-5">
+        <transition>
+            <table v-if="items.length > 0">
+                <p>Hello</p>
+            </table>
+            <p v-else>No item found</p>
+        </transition>
+    </div>-->
+    
+    <div id="list-demo">
+        <button v-on:click="add">Add</button>
+        <button v-on:click="remove">Remove</button>
+        <transition-group name="list" tad="p" mode="out-in">
+            <span v-for="item in items" v-bind:key="item" class="list-item">
+                {{item}}
+            </span>
+        </transition-group>
+    </div>
+    <div id="function">
+        <button @click="grow">Augmenter</button>
+    </div>
+
+    <div id="flip-list-demo" class="demo">
+        <button v-on:click="shuffle">Shuffle</button>
+        <transition-group name="flip-list" tag="ul">
+            <li v-for="item in items" v-bind:key="item">
+                {{item}}
+            </li>
+        </transition-group>
+    </div>
+    <div id="list-demo-complete">
+        <button @click="shuffle">Shuffle</button>
+        <button @click="add">Add</button>
+        <button @click="remove">Remove</button>
+
+        <transition-group name="flip-list" tal="ul">
+            <li v-for="item in items" v-bind:key="item">
+                {{item}}
+            </li>
+        </transition-group>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.14.1/lodash.min.js"></script> 
+    <div id="staggered-list-demo">
+        <input type="text" v-model="query">
+        <transition-group
+            name="staggered-fade"
+            tag="ul"
+            v-bind:css="false"
+            v-on:before-enter="beforeEnter"
+            v-on:enter="enter"
+            v-on:leave="leave">
+            <li
+                v-for="(item, index) in computedList"
+                v-bind:key="item.msg"
+                v-bind:data-index="index">
+                {{item.msg}}
+            </li>
+        </transition-group>
+    </div>
+
+    <div id="dynamic-fade-demo" class="demo">
+        Fade In: <input type="range" min="0" v-model="fadeInDuration" v-bind:max="maxFadeDuration"/>
+        Fade Out: <input type="range" min="0" v-model="fadeOutDuration" v-bind:max="maxFadeDuration"/>
+        <transition
+            v-bind:css="false"
+            v-on:before-enter="beforeEnter"
+            v-on:enter="enter"
+            v-on:leave="leave">
+            <p v-if="show">Hello</p>
+        </transition>
+        <button 
+            v-if="stop"
+            @click="stop = false; show = false">Start animating</button>
+        <button v-else @click="stop = true">Stop it!</button>
+    </div>
+
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/velocity/1.2.3/velocity.min.js"></script>  
+    <script  src="https://unpkg.com/vue"></script>
+    
+    
+    <script>
+
+        new Vue({
+            el:"#dynamic-fade-demo",
+            data: {
+                show: true,
+                fadeInDuration: 1000,
+                fadeOutDuration: 1000,
+                maxFadeDuration: 1500,
+                stop: true
+            },
+            mounted: function(){
+                this.show = false
+            },
+            methods:{
+                beforeEnter: function(el){
+                    el.style.enter = 0
+                },
+                enter: function(el, done){
+                    var vm = this;
+                    Velocity(el,
+                        {opacity: 1},
+                        { 
+                            duration: this.fadeInDuration,
+                            complete: function(){
+                                done()
+                                if(!vm.stop) vm.show = false;
+                            }
+                        }
+                    )
+                },
+                leave: function(el, done) {
+                    var vm = this
+                    Velocity(el,
+                    {opacity: 0},
+                    {
+                        duration: this.fadeOutDuration,
+                        complete: function() {
+                            done();
+                            vm.show = true;
+                        }
+                    })
+                }
+            }
+        })
+
+        new Vue({
+            el:"#staggered-list-demo",
+            data: {
+                query:'',
+                list:[
+                    {msg: 'Bruce Lee'},
+                    {msg: 'Jackie Chan'},
+                    {msg: 'Chuck Norris'},
+                    {msg: 'Jet Li'},
+                    {msg: 'Kung Fury'}
+                ]
+            },
+            computed: {
+                computedList: function(){
+                    var vm = this
+                    return this.list.filter(function(item){
+                        return item.msg.toLowerCase().indexOf(vm.query.toLowerCase()) !== -1
+                    })
+                }
+            },
+            methods: {
+                beforeEnter: function(el){
+                    el.style.opacity = 0
+                    el.style.height = 0
+                },
+                enter: function(el, done) {
+                    var delay = el.dataset.index * 150
+                    setTimeout(function(){
+                        Velocity(
+                            el,
+                            {opacity: 1, height: '1.6em'},
+                            {complete: done}
+                        )
+                    }, delay)
+                },
+                leave: function(el, done){
+                    var delay = el.dataset.index * 150
+                    setTimeout(function(){
+                        Velocity(
+                            el,
+                            {opacity: 0, height: '0'},
+                            {complete: done}
+                        )
+                    }, delay)
+                }
+            }
+        })
+        
+        new Vue({
+            el:"#list-demo-complete",
+            data: {
+                items: [1,2,3,4,5,6,7,8,9],
+                nextNum: 10
+            },
+            methods: {
+                randomIndex: function(){
+                    return Math.floor(Math.random() * this.items.length)
+                },
+                add: function(){
+                    this.items.splice(this.randomIndex(), 0, this.nextNum++)
+                },
+                remove: function(){
+                    this.items.splice(this.randomIndex(), 1)
+                },
+                shuffle: function(){
+                    this.items = _.shuffle(this.items)
+                }
+            }
+        })
+
+        new Vue({
+            el:'#flip-list-demo',
+            data: {
+                items: [1,2,3,4,5,6,7,8,9],
+            },
+            methods: {
+                shuffle: function(){
+                    this.items = _.shuffle(this.items)
+                }
+            }
+        })
+
+        new Vue({
+            el:"#list-demo",
+            data: {
+                items: [1,2,3,4,5,6,7,8,9],
+                nextNum: 10
+            },
+            methods:{
+                randomIndex: function(){
+                    return Math.floor(Math.random() * this.items.length)
+                },
+                add: function(){
+                    this.items.splice(this.randomIndex(), 0, this.nextNum++)
+                },
+                remove: function(){
+                    this.items.splice(this.randomIndex(), 1)
+                }
+            }
+        })
+        new Vue({
+            el:"#demo",
+            data: {
+                show: true
+            }
+        })
+
+        new Vue({
+            el:"#example-1",
+            data: {
+                show: true
+            }
+        })
+
+        new Vue({
+            el:"#example-2",
+            data: {
+                show: true
+            }
+        })
+
+        new Vue({
+            el:'#example-3',
+            data: {
+                show: true
+            }
+        })
+
+        new Vue({
+            el:'#function',
+            data: {
+                a: 1
+            },
+            methods: {
+                grow: function(){
+                    this.a ++
+                    return console.log(this.a)
+                }
+            },
+            watch: {
+                a: function(val, oldVal){
+                    console.log('new value', val, oldVal)
+                }
+            }
+        })
+        /*new Vue({
+            el:"#example-4",
+            data: {
+                show: false
+            },
+            methods:{
+                beforeEnter: function(el) {
+                    el.style.opacity = 0
+                },
+                enter: function(el, done){
+                    Velocity(el, {opacity: 1, fontSize: '1.4em'}, {duration: 300})
+                    Velocity(el, {fontSize: '1em'}, {complete: done})
+                },
+                leave: function(el, done) {
+                    Velocity(el, {translateX: '15px', rotateZ: '50deg'}, {duration: 600})
+                    Velocity(el, {rotateZ: '100deg'}, {loop: 2})
+                    Velocity(el, {
+                        rotateZ: '45deg',
+                        translateY: '30px',
+                        opacity: 0
+                    }, {complete: done})
+                }
+            }
+        })*/
+
+        new Vue({
+            el: '#example-4',
+            data: {
+                show: false
+            },
+            methods: {
+                beforeEnter: function (el) {
+                el.style.opacity = 0
+                },
+                enter: function (el, done) {
+                Velocity(el, { opacity: 1, fontSize: '1.4em' }, { duration: 300 })
+                Velocity(el, { fontSize: '1em' }, { complete: done })
+                },
+                leave: function (el, done) {
+                Velocity(el, { translateX: '15px', rotateZ: '50deg' }, { duration: 600 })
+                Velocity(el, { rotateZ: '100deg' }, { loop: 2 })
+                Velocity(el, {
+                    rotateZ: '45deg',
+                    translateY: '30px',
+                    opacity: 0
+                }, { complete: done })
+                }
+            }
+        })
+
+        /*new Vue({
+            el:"#example-5",
+            data: {
+                items:[
+                    {
+                        text: 'coucou'
+                    },
+                    {
+                        text: 'Hello'
+                    }
+                ]
+            }
+        })*/
+    </script>
+    
+</body>
+</html>

@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <div id="exComponent" ref="exComponent">
+        <my-component></my-component>
+    
+        <simple-counter></simple-counter>
+        <simple-counter></simple-counter>
+        <simple-counter></simple-counter>
+        
+        <br>
+        <!--<child message="Bonsoir" placeholder=""></child>-->
+        <child :my-message="parentMsg"></child>
+        
+        <br>
+        <input type="text" v-model="parentMsg">
+
+        <otherchild v-bind="todo"></otherchild>
+        <br>
+        <username test="Coucou"></username>
+        <br>
+        <testprops initial-counter="30"></testprops>
+
+        <br>
+        <buttonid></buttonid>
+    </div>
+
+    <div id="counter-event-example">
+        <p>{{ total }}</p>
+        <button-counter v-on:increment="incrementTotal"></button-counter>
+        <button-counter v-on:increment="incrementTotal"></button-counter>
+        <button-counter v-on:increment="incrementTotal"></button-counter>
+    </div>
+
+    <div id="app">
+        <currency-input
+            label="Price"
+            v-model="price"
+        ></currency-input>
+        <currency-input
+            label="Shipping"
+            v-model="shipping"
+        ></currency-input>
+        <currency-input
+            label="Handling"
+            v-model="handling"
+        ></currency-input>
+        <currency-input
+            label="Discount"
+            v-model="discount"
+        ></currency-input>
+
+        <p>Total: ${{ total }}</p>
+        <hello-world></hello-world>
+    </div>
+
+
+    <div id="bindexample">
+        <test v-bind:is="currentView"></test>
+        <button @click="changeView">Click !</button>
+        <async-example></async-example>
+        <bonsoir/>
+    </div>
+    
+    <!--<div id="container">
+        <parent-component>
+        </parent-component>
+    </div>-->
+
+    <!--<h1 slot="header">Test header Slot</h1>
+    <p>Un paragraphe lambda</p>
+    <p>Et un autre</p>
+    <p slot="footer">Celui la c'est le footer</p>-->
+
+    <script type="text/x-template" id="hello-world-template">
+        <h1>Bonsoir</h1>
+    </script>
+
+    <script  src="https://unpkg.com/vue"></script>
+    <script src="https://cdn.rawgit.com/chrisvfritz/5f0a639590d6e648933416f90ba7ae4e/raw/974aa47f8f9c5361c5233bd56be37db8ed765a09/currency-validator.js"></script>
+    
+    <script>
+        Vue.component('hello-world', {
+            template: "#hello-world-template"
+        })
+
+        Vue.component('async-example', function(resolve, reject){
+            setTimeout(function(){
+                resolve({
+                    template: '<div>I am async!</div>'
+                })
+            }, 1000)
+        })
+
+        Vue.component('bonsoir', {
+            name: 'bonsoir',
+            template:'<div>HELLO GOOGLE</div>'
+        })
+
+        var Home = {
+            template: '<div>This is the home</div>'
+        }
+        var Accueil = {
+            template: '<div>This isn\'t home</div>'
+        } // Allow to create a navbar ??
+        var vm = new Vue({
+            el:"#bindexample",
+            data: {
+                currentView: Home
+            },
+            methods: {
+                changeView: function(){
+                    this.currentView = Accueil
+                }
+            }
+        })
+        /*var parents = {
+            template: '<div id="container">\
+                            <header>\
+                                <slot name="header"></slot>\
+                            </header>\
+                            <main>\
+                                <slot></slot>\
+                            </main>\
+                            <footer>\
+                                <slot name="footer"></slot>\
+                            </footer>\
+                        </div>'
+        }
+        new Vue({
+            el:"#container",
+            components: {
+                'parent-component': parents
+            }
+        })
+        Vue.component('template-slot', {
+            template: '<h1 slot="header">Test header Slot</h1>\
+            <p>Un paragraphe lambda</p>\
+            <p>Et un autre</p>\
+            <p slot="footer">Celui la c\'est le footer</p>'
+        })
+        
+        /*Vue.component('parent-header', {
+            template: ' <div id="container">\
+                            <header>\
+                                <slot name="header"></slot>\
+                            </header>\
+                            <main>\
+                                <slot></slot>\
+                            </main>\
+                            <footer>\
+                                <slot name="footer"></slot>\
+                            </footer>\
+                        </div>'
+        })*/
+
+        Vue.component('my-component', {
+            template:'<div>Example of a component</div>'
+        })
+        var child = {
+            template: '<div>A child of component</div>'
+        }
+
+        
+        Vue.component('child', {
+            //props: ['message'],
+            //camelCase in Javascript
+            props: ['myMessage'],
+            //template: '<span>{{ message }}</span>'
+            template: '<span>{{ myMessage }}</span>'
+        })
+
+        Vue.component('testprops', {
+            props: ['initialCounter'],
+            data: function(){
+                return {counter: this.initalCounter}
+            },
+            template: '<span>{{ counter }}</span>'
+        })
+
+        Vue.component('simple-counter', {
+            template: '<button @click="counter += 1"> {{counter}}</button>',
+            data: function(){
+                return {
+                    counter: 0
+                }
+            }
+        })
+
+        Vue.component( 'otherchild', {
+            template: '<span>Test</span>'
+        })
+
+        /*************************************************
+        
+        =============== CURRENCY VALIDATOR ==============  
+        
+        *************************************************/
+
+        Vue.component('currency-input', {
+            template: "\
+            <div>\
+                <label v-if='label'>{{ label }}</label>\
+                $\
+                    <input\
+                        ref='input'\
+                        v-bind:value='value'\
+                        v-on:input='updateValue($event.target.value)'\
+                        v-on:focus='selectAll'\
+                        v-on:blur='formatValue'\
+                    >\
+                </div>",
+            props: {
+                value: {
+                    type: Number,
+                    default: 0
+                },
+                label: {
+                    type: String,
+                    default: ''
+                }
+            },
+            mounted: function(){
+                this.formatValue()
+            },
+            methods: {
+                updateValue: function(value){
+                    var result = currencyValidator.parse(value, this.value)
+                    if(result.warning) {
+                        this.$refs.input.value = result.value
+                    }
+                    this.$emit('input', result.value)
+                },
+                formatValue: function(){
+                    this.$refs.input.value = currencyValidator.format(this.value)
+                    console.log(this.$refs.input.value)
+                },
+                selectAll: function(event){
+                    setTimeout(function(){
+                        event.target.select()
+                    }, 0)
+                }
+            }
+        })
+
+        new Vue({
+            el: "#app",
+            data: {
+                price: 0,
+                shipping: 0,
+                handling: 0,
+                discount: 0
+            },
+            computed: {
+                total: function(){
+                    return ((
+                        this.price * 100 + 
+                        this.shipping * 100 +
+                        this.handling * 100 - 
+                        this.discount * 100
+                    ) / 100).toFixed(2)
+                }
+            }
+        })
+
+        Vue.component('username', {
+            props:['test'],
+            template: '<input type="text" name="username">'
+        })
+
+        Vue.component('button-counter', {
+            template: '<button v-on:click="incrementCounter">{{ counter }}</button>',
+            data: function(){
+                return {
+                    counter: 0
+                }
+            },
+            methods: {
+                incrementCounter: function(){
+                    this.counter += 1,
+                    this.$emit('increment') // Allow to emit the function to parent template
+                }
+            }
+        })
+
+        Vue.component('buttonid', {
+            methods:{
+                showMyDiv: function(){
+                    console.log(this.$refs.exComponent)
+                }
+            },
+            template: '<button @click="showMyDiv"></button>'
+        })
+        Vue.component('example', {
+            // Validator props allow or not to display a variable
+            props: {
+                propA: Number,
+                propB: [String, Number],
+                propC: {
+                    type: String,
+                    required: true
+                },
+                propD: {
+                    type: Number,
+                    default: 100
+                },
+                propE: {
+                    type: Object,
+                    default: function(){
+                        return { message: 'hello'}
+                    }
+                },
+                propF: {
+                    validator: function (value) {
+                        return value > 10
+                    }
+                }
+            }
+        })
+
+
+        new Vue({
+            el:"#counter-event-example",
+            data: {
+                total: 0
+            },
+            methods: {
+                incrementTotal: function(){
+                    this.total += 1
+                }
+            }
+
+        })
+        var exComponent = new Vue ({
+            el:"#exComponent",
+            data: {
+                parentMsg: "Messages parent",
+                todo: {
+                    text: 'Learn Vue',
+                    isComplete: false
+                }
+            },
+            components: {
+                'my-component': child
+            }
+        })
+    </script>
+    
+</body>
+</html>

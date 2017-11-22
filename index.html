@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Test Vue</title>
 </head>
-<body>
+<body @keyup.right="left">
 
 
     <style>
@@ -97,7 +97,7 @@
     <p v-bind:class="[activeClass, errorClass]">POMME DE TERRE</p>
     <p v-bind:class="[isActive ? activeClass : '', errorClass]">POMME DE TERRE</p>
     <p v-bind:style="styleObject">Test Style object</p>
-</div>-->
+</div>
 <div id="app-10">
     <p v-if="ok">Hello everybody</p>
     <p v-else>No</p>
@@ -140,9 +140,103 @@
             v-bind:key="todo.id"
             v-bind:title="todo.title"
             v-on:remove="todos.splice(index, 1)" 
-        ></li>  <!-- We remove the todos thanks to is index. When the function splice has two arguments, they remove. When the function has three arguments, she edit  -->
-                <!-- The attributes 'is' allow to call the component 'todo-item' -->
+        ></li>   We remove the todos thanks to is index. When the function splice has two arguments, they remove. When the function has three arguments, she edit 
+                 The attributes 'is' allow to call the component 'todo-item'
     </ul>
+</div>
+
+<div id="example1">
+    <button @click="counter += 1"> Add 1</button>
+    <button @click="greet">Greet</button>
+    <p>The button above has been clicked {{ counter }} times.</p>
+    <button @click="say('hi')">Say hi</button>
+    <button @click="say('hello')">Say hello</button>
+    <button @click="warn('Form cannot be submitted yet : ', $event)">Submit</button>
+
+    <a @click.stop="doThis">Alert</a>
+    <a @click.stop.prevent="doThis">Alert</a>
+    <br>
+    <input type="text" v-on:keyup.13="doThis"><br>
+    <input type="text" v-on:keyup.enter="doThis">
+    <input type="text" v-on:keyup.up="up"><br>
+    <input type="text" v-on:keyup.alt.67="up"><br>
+    <button @click="up">Up</button>
+    <button @click="left">Left</button>
+    <button @click="right">Right</button>
+    <button @click="down">Down</button>
+
+    <button @click.ctrl.exact>A</button>
+</div>-->
+
+<div id="testForm">
+        <input v-model="message" placeholder="edit me">
+        <p>Message is: {{ message }}</p>
+        <br>
+
+        <span>Multiligne message is:</span>
+        <p>{{ MessageML }}</p>
+        <textarea v-model="MessageML" cols="30" rows="10"></textarea>
+        <br>
+
+        <input type="checkbox" v-model="checked">
+        <label>{{checked}}</label>
+        <br>
+
+        <input type="checkbox" id="Jack" value="Jack" v-model="checkedNames">
+        <label for="Jack">Jack</label>
+        <input type="checkbox" id="John" value="John" v-model="checkedNames">
+        <label for="John">John</label>
+        <input type="checkbox" id="Mike" value="Mike" v-model="checkedNames">
+        <label for="Mike">Mike</label>
+        <br>
+        <span>Checked names: {{ checkedNames }}</span>    
+        
+        <br>
+        <select v-model="selected">
+            <option disabled value="">Please select one :</option>
+            <option>A</option>
+            <option>B</option>
+            <option>C</option>
+        </select>
+        <span>Selected: {{ selected }}</span>
+
+        <br>
+        <input type="radio" id="one" value="One" v-model="picked">
+        <label for="one">One</label><br>
+        <input type="radio" id="two" value="Two" v-model="picked">
+        <label for="two">Two</label><br>
+        <span>Picked: {{ picked }}</span>
+
+        <br>
+        <select v-model="selectedMul" multiple>
+            <option>A</option>
+            <option>B</option>
+            <option>C</option>
+        </select>
+        <br>
+        <span>Selected: {{ selectedMul }}</span>
+        
+        <br>
+        <select v-model="selectedTable">
+            <option v-for="option in options" v-bind:value="option.value">
+                {{ option.text }}
+            </option>
+        </select>
+        <p>Selected: {{ selectedTable }}</p>
+
+        <br>
+        <!--<input type="checkbox" v-model="toggle" v-bind:true-value="a" v-bind:false-value="b">
+        <p>Selected: {{ toggle }}</p>-->
+
+        <br>
+        <input type="text" v-model.lazy="func"> <!-- Allow to reload the p element after pull out the cursor of input -->
+        <p>{{ func }}</p>
+
+        <br>
+        <input type="number" v-model.number="age">
+
+        <br>
+        <input type="text" v-model.trim="msg">
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/axios@0.12.0/dist/axios.min.js"></script>
@@ -150,6 +244,68 @@
 <script  src="https://unpkg.com/vue"></script>
 
 <script>
+
+    var testForm = new Vue ({
+        el:"#testForm",
+        data: {
+            message : null,
+            MessageML: null,
+            checked: true,
+            checkedNames: [],
+            selected: '',
+            picked: '',
+            selectedMul: [],
+            selectedTable: 'A',
+            options: [
+                {text: 'One', value:'A'},
+                {text: 'Two', value:'B'},
+                {text: 'Three', value:'C'}
+            ],
+            a: "a",
+            b: "b",
+            func: '',
+            age: '12',
+            msg: 'Hello everibody'
+        }
+    })
+/*
+    var example1 = new Vue({
+        el:"#example1",
+        data: {
+            counter: 0,
+            name: 'Vue.js'
+        },
+        methods: {
+            greet: function(event){
+                alert('Hello' + this.name + '!')
+                if(event){
+                    alert(event.target.tagName)
+                }
+            },
+            say: function(message){
+                alert(message)
+            },
+            warn: function(message, event) {
+                if(event) event.preventDefault()
+                alert(message)
+            },
+            doThis: function() {
+                alert('Bonjour');
+            },
+            up: function() {
+                alert('up')
+            },
+            down: function(){
+                alert('down')
+            },
+            left: function(){
+                alert('left')
+            },
+            right: function(){
+                alert('right')
+            }
+        }
+    })
 
     Vue.component('todo-item',{
         template: '\

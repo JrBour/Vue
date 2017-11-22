@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+
+    <style>
+        body{
+             cursor: url('https://s3-us-west-2.amazonaws.com/s.cdpn.io/28963/cockroach%20(2).ico'), default;
+        }
+    </style>
+
+    <script src="https://cdn.jsdelivr.net/npm/tween.js@16.3.4"></script>
+    <script src="https://cdn.jsdelivr.net/npm/color-js@1.0.3"></script>
+    <script  src="https://unpkg.com/vue"></script>
+
+    <div id="animated-number-demo">
+        <input v-model.number="number" type="number" step="20">
+        <p>{{ animatedNumber }}</p>
+    </div>
+
+    <div id="example-7">
+        <input v-model="colorQuery" v-on:keyup.enter="updateColor" placeholder="Enter a color">
+        <button @click="updateColor">Update</button>
+        <p>Preview: </p>
+        <span v-bind:style="{backgroundColor: tweenedCSSColor}" class="example-7-color-preview"></span>
+        <p>{{ tweenedCSSColor }}</p>
+    </div>
+
+        <script>
+
+        new Vue({
+            el:"#example-7",
+            data: {
+                colorQuery: '',
+                color: {
+                    red: 0,
+                    green: 0,
+                    blue: 0,
+                    alpha: 1
+                },
+                tweenedColor: {}
+            },
+            created: function(){
+                this.tweenedColor = Object.assign({}, this.color)
+            },
+            watch: {
+                color: function() {
+                    function animate() {
+                        if(TWEEN.update()){
+                            requestAnimationFrame(animate)
+                        }
+                    }
+                    new TWEEN.Tween(this.tweenedColor)
+                    .to(this.color, 750)
+                    .start()
+
+                    animate();
+                }
+            }
+        })
+
+        new Vue({
+            el:"#animated-number-demo",
+            data: {
+                number: 0,
+                animatedNumber: 0
+            },
+            watch: {
+                number: function(oldValue, newValue){
+                    var vm = this
+                    function animate(){
+                        if(TWEEN.update()) {
+                            requestAnimationFrame(animate)
+                        }
+                    }
+
+                    new TWEEN.Tween({ tweeningNumber: oldValue })
+                    .easing(TWEEN.Easing.Quadratic.Out)
+                    .to({ tweeningNumber: newValue}, 500)
+                    .onUpdate(function(){
+                        vm.animatedNumber = this.tweeningNumber.toFixed(0)
+                    })
+                    .start();
+
+                    animate();
+                }
+            }
+        })
+        </script>
+
+</body>
+</html>
